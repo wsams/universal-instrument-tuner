@@ -41,6 +41,9 @@ let shownCents = 0;
 let shownHz = null;
 let shownNumber = null;
 let lastAnnounced = "";
+let lastAnnounceAt = 0;
+let announcedNote = "";
+let announcedInTune = false;
 let tone = null;
 let lastView = tracker.current();
 
@@ -86,6 +89,21 @@ function formatHz(value) {
   return value >= 100 ? value.toFixed(1) : value.toFixed(2);
 }
 
+function centsPhrase(cents) {
+  const amount = Math.abs(cents);
+  const unit = amount === 1 ? "cent" : "cents";
+  if (cents > 0) return `${amount} ${unit} sharp`;
+  if (cents < 0) return `${amount} ${unit} flat`;
+  return "";
+}
+
+function announcement(view, cents) {
+  if (!view.active) return "";
+  const offset = centsPhrase(cents);
+  if (view.inTune) return offset ? `${view.name}, in tune, ${offset}` : `${view.name}, in tune`;
+  return offset ? `${view.name}, ${offset}` : `${view.name}`;
+}
+
 function applySettingsFromInputs() {
   const spell = spellButton.getAttribute("aria-pressed") === "true" ? "flat" : "sharp";
   tracker.configure({
@@ -98,6 +116,10 @@ function applySettingsFromInputs() {
   windowValue.textContent = `±${windowInput.value}`;
   steadyValue.textContent = steadyLabel(Number(steadyInput.value));
   spellButton.textContent = spell === "flat" ? "♭" : "♯";
+  spellButton.setAttribute(
+    "aria-label",
+    spell === "flat" ? "Using flat note names" : "Using sharp note names",
+  );
   zone.style.width = `${Number(windowInput.value) * 2}%`;
   a4Input.setAttribute("aria-valuetext", `${a4Input.value} hertz`);
   windowInput.setAttribute("aria-valuetext", `plus or minus ${windowInput.value} cents`);
@@ -140,12 +162,14 @@ function paint(view, snap) {
   hearNote.textContent = view.targetName;
   hearButton.setAttribute("aria-label", hearing ? `Stop sounding ${view.targetName}` : `Hear ${view.targetName}`);
 
-  const announce = view.active
-    ? `${view.name}, ${view.status === "in-tune" ? "in tune" : view.status}`
-    : "";
-  if (announce !== lastAnnounced) {
+  const announce = announcement(view, view.active ? shownNumber : 0);
+  const urgent = announce === "" || view.name !== announcedNote || Boolean(view.inTune) !== announcedInTune;
+  if (announce !== lastAnnounced && (urgent || performance.now() - lastAnnounceAt >= 800)) {
     live.textContent = announce;
     lastAnnounced = announce;
+    lastAnnounceAt = performance.now();
+    announcedNote = view.name;
+    announcedInTune = Boolean(view.inTune);
   }
 
   if (!view.active) shownCents = 0;
