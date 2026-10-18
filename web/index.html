@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Universal Instrument Tuner</title>
+    <meta
+      name="description"
+      content="Free chromatic tuner for any instrument. Play a note and see how close you are. Steady, accurate, and ready in the browser."
+    />
+    <meta name="theme-color" content="#08090b" />
+    <link rel="canonical" href="https://wsams.github.io/universal-instrument-tuner/" />
+    <meta property="og:title" content="Universal Instrument Tuner" />
+    <meta
+      property="og:description"
+      content="Tune any instrument in the browser. The needle stays still while you bring the note in."
+    />
+    <meta property="og:url" content="https://wsams.github.io/universal-instrument-tuner/" />
+    <meta property="og:type" content="website" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1 class="sr-only">Universal Instrument Tuner</h1>
+    <div class="app is-idle" id="app">
+      <div class="glow" aria-hidden="true"></div>
+      <header class="top">
+        <p class="brand">Tuner</p>
+        <p class="status">
+          <span class="dot" id="dot" aria-hidden="true"></span>
+          <span id="status-label">Tap to tune</span>
+        </p>
+      </header>
+
+      <section class="stage">
+        <button class="start" id="start" type="button">
+          <span class="start-title" id="start-title">Tap to tune</span>
+          <span class="start-sub" id="start-sub">Any instrument. Nothing is recorded.</span>
+        </button>
+
+        <div class="readout" id="readout" hidden>
+          <div class="note" aria-hidden="true">
+            <span class="letter" id="letter">—</span>
+            <span class="aside" id="aside" hidden>
+              <span class="accidental" id="accidental"></span>
+              <span class="octave" id="octave"></span>
+            </span>
+          </div>
+          <p class="cents" aria-hidden="true"><span id="cents-num"></span></p>
+          <p class="detail" id="detail" aria-hidden="true">Play a note</p>
+          <div class="meter" id="meter">
+            <div class="meter-track">
+              <div class="zone" id="zone"></div>
+              <div class="line"></div>
+              <div class="ticks" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="zero"></div>
+              <div class="thumb" id="thumb"></div>
+            </div>
+            <div class="meter-ends" aria-hidden="true"><span>flat</span><span>sharp</span></div>
+          </div>
+        </div>
+        <p class="sr-only" id="live" aria-live="polite"></p>
+      </section>
+
+      <section class="dock" aria-label="Tuner settings">
+        <label class="dial">
+          <span class="dial-name">Concert A</span>
+          <span class="dial-value"><span id="a4-value">440</span><span class="unit">Hz</span></span>
+          <input id="a4" type="range" min="415" max="466" step="1" value="440" aria-label="Concert A in hertz" />
+          <span class="dial-foot"><span>415</span><span>466</span></span>
+        </label>
+        <label class="dial">
+          <span class="dial-name">In tune</span>
+          <span class="dial-value"><span id="window-value">±5</span><span class="unit">cents</span></span>
+          <input id="window" type="range" min="1" max="12" step="1" value="5" aria-label="How close counts as in tune" />
+          <span class="dial-foot"><span>±1</span><span>±12</span></span>
+        </label>
+        <label class="dial">
+          <span class="dial-name">Steady</span>
+          <span class="dial-value"><span id="steady-value">Calm</span></span>
+          <input id="steady" type="range" min="0" max="100" step="1" value="72" aria-label="How steady the needle is" />
+          <span class="dial-foot"><span>quick</span><span>still</span></span>
+        </label>
+        <div class="side">
+          <button type="button" class="spell" id="spell" aria-pressed="false" aria-label="Using sharp note names">♯</button>
+          <button type="button" class="hear" id="hear" aria-pressed="false" aria-label="Hear A4">
+            <span class="hear-kicker">Hear</span>
+            <span class="hear-note" id="hear-note">A4</span>
+          </button>
+        </div>
+      </section>
+    </div>
+    <noscript>This tuner needs JavaScript turned on.</noscript>
+    <script src="app.js"></script>
+  </body>
+</html>

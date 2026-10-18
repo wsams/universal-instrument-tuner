@@ -1,0 +1,513 @@
+:root {
+  color-scheme: dark;
+  --bg: #08090b;
+  --paper: #f3efe6;
+  --muted: #9c968c;
+  --line: rgba(243, 239, 230, 0.16);
+  --note-size: clamp(6.25rem, min(44vh, 52vw), 70rem);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--paper);
+  font-family: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+button, input { font: inherit; color: inherit; }
+
+.app {
+  --mark: var(--paper);
+  --glow: transparent;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background:
+    radial-gradient(ellipse 75% 46% at 50% 40%, var(--glow), transparent 70%),
+    var(--bg);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app.is-flat { --mark: #d5e1ff; --glow: rgba(126, 162, 255, 0.28); }
+.app.is-sharp { --mark: #ffd0b8; --glow: rgba(255, 148, 96, 0.26); }
+.app.is-tune { --mark: #e5ffee; --glow: rgba(150, 224, 176, 0.34); }
+
+.glow { display: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] { display: none !important; }
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(0.9rem + env(safe-area-inset-top)) clamp(1.1rem, 4vw, 3.2rem) 0.35rem;
+  position: relative;
+  z-index: 1;
+}
+
+.brand, .status { margin: 0; }
+
+.brand {
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.dot {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0.28rem rgba(243, 239, 230, 0.05);
+}
+
+.app.is-listening .dot { color: #d7efe0; background: #b7e7c8; }
+.app.is-live .dot { color: var(--mark); background: var(--mark); }
+
+.app.is-listening:not(.is-live) .dot {
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% { opacity: 0.35; }
+}
+
+.stage {
+  position: relative;
+  min-height: 0;
+  z-index: 1;
+}
+
+.start, .readout {
+  width: 100%;
+  height: 100%;
+}
+
+.start {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.start-title {
+  font-family: "Instrument Serif", Georgia, "Iowan Old Style", serif;
+  font-size: clamp(4.2rem, min(16vw, 18vh), 9.5rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+}
+
+.start-sub, .detail, .meter-ends, .dial-foot, .dial-name, .hear-kicker {
+  color: var(--muted);
+}
+
+.start-sub {
+  max-width: 22rem;
+  font-size: clamp(1rem, 2vh, 1.2rem);
+  line-height: 1.45;
+}
+
+.readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.15rem, 1vh, 0.7rem);
+  padding: 0 1rem 0.25rem;
+}
+
+.note {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: var(--mark);
+  font-size: var(--note-size);
+  line-height: 0.82;
+}
+
+.aside {
+  position: absolute;
+  left: 100%;
+  top: 0.06em;
+  bottom: 0.02em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: 0.04em;
+}
+
+.letter, .accidental {
+  font-family: "Instrument Serif", Georgia, "Iowan Old Style", serif;
+  font-weight: 400;
+}
+
+.letter {
+  font-size: 1em;
+  letter-spacing: -0.045em;
+}
+
+.app.is-idle .letter { color: rgba(243, 239, 230, 0.28); }
+
+.accidental {
+  font-size: 0.3em;
+  line-height: 0.75;
+}
+
+.octave {
+  margin-top: auto;
+  font-family: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.16em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.cents {
+  margin: 0;
+  min-height: 1.05em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: clamp(2rem, 6.2vh, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--mark);
+}
+
+.cents-unit {
+  margin-left: 0.08em;
+  font-size: 0.55em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.detail {
+  margin: 0;
+  min-height: 1.3em;
+  font-size: clamp(0.95rem, 2vh, 1.15rem);
+  letter-spacing: 0.04em;
+}
+
+.app.is-tune .detail { color: #d5f5e2; }
+.app.is-holding .note,
+.app.is-holding .cents,
+.app.is-holding .detail { opacity: 0.55; }
+
+.meter { width: min(88vw, 76rem); }
+
+.meter-track {
+  position: relative;
+  height: clamp(2rem, 6vh, 3.4rem);
+}
+
+.zone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 0.7rem;
+  width: 10%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgba(190, 236, 206, 0.16);
+}
+
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--line);
+}
+
+.ticks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ticks span {
+  width: 1px;
+  height: 0.42rem;
+  margin-top: calc(50% - 0.21rem);
+  background: rgba(243, 239, 230, 0.28);
+}
+
+.ticks span:nth-child(3) { opacity: 0; }
+
+.zero {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  bottom: 18%;
+  width: 1px;
+  background: rgba(243, 239, 230, 0.55);
+}
+
+.thumb {
+  position: absolute;
+  top: 6%;
+  bottom: 6%;
+  left: 50%;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--mark);
+  transform: translateX(-50%);
+  box-shadow: 0 0 14px 1px var(--glow);
+  opacity: 0;
+}
+
+.app.is-live .thumb { opacity: 1; }
+.app.is-holding .thumb { opacity: 0.4; }
+
+.meter-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dock {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: clamp(0.85rem, 2.4vw, 2.6rem);
+  align-items: end;
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  padding: 0.35rem clamp(1.1rem, 4vw, 3.2rem) calc(0.95rem + env(safe-area-inset-bottom));
+}
+
+.dial {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.dial-name {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dial-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-height: 1.15em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.dial-value .unit {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dial-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1.7rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]:focus { outline: none; }
+
+input[type="range"]:focus-visible {
+  outline: 2px solid rgba(214, 242, 224, 0.85);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: rgba(243, 239, 230, 0.28);
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: -0.46rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 0.35rem rgba(8, 9, 11, 0.85), 0 0 0 0.42rem rgba(243, 239, 230, 0.2);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: rgba(243, 239, 230, 0.28);
+  border: 0;
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.side {
+  display: flex;
+  gap: 0.55rem;
+  align-items: stretch;
+}
+
+.spell, .hear {
+  appearance: none;
+  border: 1px solid rgba(243, 239, 230, 0.18);
+  background: transparent;
+  cursor: pointer;
+  border-radius: 1rem;
+}
+
+.spell {
+  width: 3.1rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.hear {
+  min-width: 5.6rem;
+  padding: 0.45rem 0.9rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.05rem;
+}
+
+.hear-kicker {
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hear-note {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  color: var(--paper);
+}
+
+.spell:hover, .hear:hover, .start:hover .start-title { color: white; }
+
+.hear:hover .hear-note, .spell:hover { color: white; }
+
+.hear[aria-pressed="true"] {
+  background: rgba(190, 236, 206, 0.12);
+  border-color: rgba(190, 236, 206, 0.55);
+}
+
+.hear[aria-pressed="true"] .hear-kicker,
+.hear[aria-pressed="true"] .hear-note { color: #e5ffee; }
+
+.spell:focus-visible, .hear:focus-visible, .start:focus-visible {
+  outline: 2px solid rgba(214, 242, 224, 0.85);
+  outline-offset: 3px;
+}
+
+.spell:focus-visible, .hear:focus-visible { border-radius: 1rem; }
+
+@media (max-width: 760px) {
+  .dock { grid-template-columns: 1fr 1fr; }
+  .side { grid-column: 1 / -1; }
+  .hear { flex: 1; }
+  .dial-foot { display: none; }
+}
+
+@media (max-height: 560px) {
+  :root { --note-size: clamp(3.6rem, 30vh, 7rem); }
+  .start-title { font-size: clamp(2.8rem, 22vh, 5rem); }
+  .cents { font-size: clamp(1.4rem, 8vh, 2.2rem); }
+  .meter-track { height: 1.7rem; }
+  .top { padding-top: calc(0.35rem + env(safe-area-inset-top)); }
+  .dock { padding-top: 0; gap: 0.6rem; }
+  .dial-value { font-size: 1.15rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app.is-listening:not(.is-live) .dot { animation: none; }
+}
+
+noscript {
+  position: fixed;
+  inset: auto 1rem 1rem 1rem;
+  text-align: center;
+  color: var(--muted);
+}
